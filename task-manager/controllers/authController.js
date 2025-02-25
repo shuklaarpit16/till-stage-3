@@ -43,13 +43,19 @@ exports.loginUser = async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ error: "Invalid email or password" });
     }
+  
 
     // Generate JWT token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "10m" });
 
     res.json({ token });
   } catch (error) {
     res.status(500).json({ error: "Server error" });
   }
+};
+
+// ✅ Logout User
+exports.logoutUser = (req, res) => {
+  res.status(200).json({ message: "User logged out successfully. Please remove the token on the client side." });
 };
 

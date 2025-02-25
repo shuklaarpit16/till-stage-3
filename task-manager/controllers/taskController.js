@@ -15,6 +15,63 @@ exports.createTask = async (req, res) => {
   }
 };
 
+
+// ✅ Get all tasks for the logged-in user
+exports.getTasks = async (req, res) => {
+  try {
+    const userId = req.user.id; // Get user from token
+    const tasks = await Task.find({ user: userId });
+
+    res.json(tasks);
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+// ✅ Update a task by ID
+exports.updateTask = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const userId = req.user.id; // Get user from token
+
+    // Find and update the task only if it belongs to the user
+    const task = await Task.findOneAndUpdate(
+      { _id: taskId, user: userId },
+      req.body,
+      { new: true, runValidators: true }
+    );
+
+    if (!task) {
+      return res.status(404).json({ error: "Task not found or unauthorized" });
+    }
+
+    res.json({ message: "Task updated successfully", task });
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+// ✅ Delete a task by ID
+exports.deleteTask = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const userId = req.user.id; // Get user from token
+
+    // Find and delete the task only if it belongs to the user
+    const task = await Task.findOneAndDelete({ _id: taskId, user: userId });
+
+    if (!task) {
+      return res.status(404).json({ error: "Task not found or unauthorized" });
+    }
+
+    res.json({ message: "Task deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+
+
 // ✅ Get task count by category
 exports.countByCategory = async (req, res) => {
   try {
